@@ -5,66 +5,22 @@ package io.github.rostikq.task02;
 //
 //
 
-enum NotificationChannel {
-    EMAIL,
-    SMS,
-    PUSH,
-    TELEGRAM
-}
 
-class NotificationMessage {
-    private String recipient;
-    private String subject;
-    private String body;
-    private String priority;
-
-    public NotificationMessage(String recipient, String subject, String body, String priority) {
-        this.recipient = recipient;
-        this.subject = subject;
-        this.body = body;
-        this.priority = priority;
-    }
-
-    public String getRecipient() { return recipient; }
-    public String getSubject() { return subject; }
-    public String getBody() { return body; }
-    public String getPriority() { return priority; }
-}
+import java.util.Map;
+import java.util.Objects;
 
 public class NotificationSender {
+    private final Map<NotificationChannel, NotificationStrategy> strategies;
+
+    public NotificationSender(Map<NotificationChannel, NotificationStrategy> strategies) {
+        this.strategies = Objects.requireNonNull(strategies);
+    }
 
     public boolean send(NotificationMessage message, NotificationChannel channel) {
-        switch (channel) {
-            case EMAIL:
-                System.out.println("[EMAIL] To: " + message.getRecipient());
-                System.out.println("[EMAIL] Subject: " + message.getSubject());
-                System.out.println("[EMAIL] Body: " + message.getBody());
-                System.out.println("[EMAIL] Статус: Відправлено через SMTP сервер.");
-                return true;
-
-            case SMS:
-                // Для SMS обрізаємо довжину тексту до 160 символів
-                String body = message.getBody();
-                String shortText = body.length() > 160 ? body.substring(0, 157) + "..." : body;
-                System.out.println("[SMS] Phone: " + message.getRecipient());
-                System.out.println("[SMS] Text: " + shortText);
-                System.out.println("[SMS] Статус: Надіслано через GSM шлюз.");
-                return true;
-
-            case PUSH:
-                System.out.println("[PUSH] DeviceToken: " + message.getRecipient());
-                System.out.println("[PUSH] Payload: { message.getSubject(): " + message.getSubject() + " + message.getBody(): " + message.getBody() + " }");
-                System.out.println("[PUSH] Статус: Доставлено через Firebase Cloud Messaging.");
-                return true;
-
-            case TELEGRAM:
-                System.out.println("[TELEGRAM] ChatId: " + message.getRecipient());
-                System.out.println("[TELEGRAM] Message: *" + message.getSubject() + "*" + message.getBody());
-                        System.out.println("[TELEGRAM] Статус: Надіслано через Bot API.");
-                return true;
-
-            default:
-                throw new UnsupportedOperationException("Канал сповіщення " + channel + " не підтримується.");
+        NotificationStrategy strategy = strategies.get(channel);
+        if (strategy == null) {
+            throw new UnsupportedOperationException("Канал сповіщення " + channel + " не підтримується.");
         }
+        return strategy.send(message);
     }
 }
