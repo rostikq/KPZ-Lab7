@@ -1,16 +1,19 @@
 package io.github.rostikq.task01;
 
+import java.util.Objects;
+
 public class CourseGrade {
-    private String courseName;
-    private int score; // 0 - 100
-    private int ectsCredits;
+    private final String courseName;
+    private final int score;
+    private final int ectsCredits;
+
+    public CourseGrade(String courseName, int score, int ectsCredits) {
+        this.courseName = Objects.requireNonNull(courseName, "Course name required");
+        this.score = score;
+        this.ectsCredits = ectsCredits;
+    }
 
     public String getCourseName() { return courseName; }
-    public void setCourseName(String courseName) { this.courseName = courseName; }
-
     public int getScore() { return score; }
-    public void setScore(int score) { this.score = score; }
-
     public int getEctsCredits() { return ectsCredits; }
-    public void setEctsCredits(int ectsCredits) { this.ectsCredits = ectsCredits; }
 }
